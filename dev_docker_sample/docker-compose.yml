@@ -1,6 +1,6 @@
 version: '3'
 services:
-  web:
+  web: &app_base
     build:
       context: .
     volumes:
@@ -14,6 +14,21 @@ services:
       - DATABASE_URL=mysql2://webapp:webapp@mysql/webapp_development
     depends_on:
       - mysql
+  spring:
+    <<: *app_base
+    ports: []
+    command: bin/spring server
+    stdin_open: true
+    tty: true
+    # pid: host
+    environment:
+      - RACK_ENV=development
+      - DATABASE_URL=mysql2://webapp:webapp@mysql/webapp_development
+      - SPRING_SOCKET=/tmp/spring/spring.soc
+    volumes:
+      - .:/app
+      - /app/vendor
+      - spring:/tmp/spring
 
   mysql:
     image: mysql:5.7
@@ -28,3 +43,4 @@ services:
 
 volumes:
   mysql-webapp-data:
+  spring:
